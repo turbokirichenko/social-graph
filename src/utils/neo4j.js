@@ -9,6 +9,8 @@ var neo4j = require('neo4j-driver');
  */
 function bootsrtap() {
     try {
+        console.log(process.env.NEO4J_DRIVER_URL);
+        console.log(process.env.NEO4J_USERNAME);
         const driver = neo4j.driver(
             process.env.NEO4J_DRIVER_URL,
             neo4j.auth.basic(process.env.NEO4J_USERNAME, process.env.NEO4J_PASSWORD)
@@ -17,9 +19,6 @@ function bootsrtap() {
             defaultAccessMode: neo4j.session.WRITE, 
             database: process.env.NEO4J_DEFAULT_DATABASE 
         });
-        session.run('MATCH () - [k] -> () RETURN k').then((result) => {
-            console.log(result);
-        })
         return { driver, session }
     } catch (err) {
         console.error('[ERROR]: Something went wrong, please check the neo4j environments...');
