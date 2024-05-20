@@ -125,7 +125,6 @@ async function main() {
                 }
                 const otherNames = relation[key].map((link) => {
                     const index= link - 1;
-                    console.log('INDEX: ', index);
                     return graph.nodes[index].name;
                 });
                 const whr1 = withObj ? '' : `${node1.temp}.name = '${node1Name}'`;
