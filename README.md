@@ -22,4 +22,6 @@ git clone
 cd social-graph
 npm ci
 npm run dev
+
+# your result waiting you from ./eample.history.txt
 ```

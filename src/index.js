@@ -1,6 +1,7 @@
 var neo4jconnection = require('./utils/neo4j');
 var { create, match, mergeRelation, returnResult, setRelationType } = require('./constants/commands.template');
 var graph = require('./utils/json-parse')();
+var fs = require('fs');
 
 const { driver, session } = neo4jconnection();
 
@@ -141,6 +142,8 @@ async function main() {
     })
     console.log(history);
     driver.close().then(() => console.log('close connection'));
+    fs.writeFileSync(process.cwd()+'/example.history.txt', history.join('\n'));
 }
+
 
 main();

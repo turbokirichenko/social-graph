@@ -1,0 +1,63 @@
+CREATE (me:Folk {name: "Поликарп (имя)", city: "Южно-Сахалинск"}) 
+CREATE (man:Folk {name: "Савва", city: "Кемерово"}) 
+CREATE (temporary:Folk {name: "Тит", city: "Брянск"}) 
+CREATE (human:Folk {name: "Сильвестр (имя)", city: "Нальчик"}) 
+CREATE (temp:Folk {name: "Доля", city: "Элиста"}) 
+CREATE (b:Folk {name: "Данакт", city: "Мурманск"}) 
+CREATE (temporary:Folk {name: "Иннокентий", city: "Томск"}) 
+CREATE (name:Folk {name: "Рузиля", city: "Тула"}) 
+CREATE (b:Folk {name: "Влас", city: "Ярославль"}) 
+CREATE (name:Folk {name: "Тихон", city: "Санкт-Петербург"}) 
+CREATE (human:Folk {name: "Аникита", city: "Калининград"}) 
+CREATE (a:Folk {name: "Аристарх", city: "Владимир"}) 
+MATCH (man:Folk ) WHERE man.name = 'Поликарп (имя)' MATCH (some:Folk ) WHERE some.name <> man.name MERGE (man)-[to:knows]->(some) RETURN count(to)
+MATCH (b:Folk ) WHERE b.name = 'Савва' MATCH (c:Folk ) WHERE c.name <> b.name MERGE (b)-[super:knows]->(c) RETURN count(super)
+MATCH (temporary:Folk ) WHERE temporary.name = 'Тит' MATCH (name:Folk ) WHERE name.name <> temporary.name MERGE (temporary)-[u:knows]->(name) RETURN count(u)
+MATCH (f:Folk ) WHERE f.name = 'Сильвестр (имя)' MATCH (temp:Folk ) WHERE temp.name <> f.name MERGE (f)-[k:knows]->(temp) RETURN count(k)
+MATCH (temporary:Folk ) WHERE temporary.name = 'Доля' MATCH (name:Folk ) WHERE name.name <> temporary.name MERGE (temporary)-[relation:knows]->(name) RETURN count(relation)
+MATCH (man:Folk ) WHERE man.name = 'Данакт' MATCH (some:Folk ) WHERE some.name <> man.name MERGE (man)-[super:knows]->(some) RETURN count(super)
+MATCH (me:Folk ) WHERE me.name = 'Иннокентий' MATCH (other:Folk ) WHERE other.name <> me.name MERGE (me)-[k:knows]->(other) RETURN count(k)
+MATCH (d:Folk ) WHERE d.name = 'Рузиля' MATCH (e:Folk ) WHERE e.name <> d.name MERGE (d)-[u:knows]->(e) RETURN count(u)
+MATCH (human:Folk ) WHERE human.name = 'Влас' MATCH (man:Folk ) WHERE man.name <> human.name MERGE (human)-[relation:knows]->(man) RETURN count(relation)
+MATCH (c:Folk ) WHERE c.name = 'Тихон' MATCH (d:Folk ) WHERE d.name <> c.name MERGE (c)-[u:knows]->(d) RETURN count(u)
+MATCH (human:Folk ) WHERE human.name = 'Аникита' MATCH (man:Folk ) WHERE man.name <> human.name MERGE (human)-[to:knows]->(man) RETURN count(to)
+MATCH (me:Folk ) WHERE me.name = 'Аристарх' MATCH (other:Folk ) WHERE other.name <> me.name MERGE (me)-[follow:knows]->(other) RETURN count(follow)
+MATCH (c:Folk { name: 'Поликарп (имя)' })  MATCH (d:Folk ) WHERE d.name IN ["Тит", "Доля", "Рузиля"] AND d.name <> c.name MERGE (c)-[u:knows]->(d) SET u.tyre__like='нравится' RETURN u
+MATCH (e:Folk { name: 'Поликарп (имя)' })  MATCH (f:Folk ) WHERE f.name IN ["Доля"] AND f.name <> e.name MERGE (e)-[super:knows]->(f) SET super.tyre__love='любит' RETURN super
+MATCH (a:Folk { name: 'Савва' })  MATCH (b:Folk ) WHERE b.name IN ["Сильвестр (имя)", "Доля", "Рузиля"] AND b.name <> a.name MERGE (a)-[super:knows]->(b) SET super.tyre__like='нравится' RETURN super
+MATCH (man:Folk { name: 'Савва' })  MATCH (some:Folk ) WHERE some.name IN ["Сильвестр (имя)"] AND some.name <> man.name MERGE (man)-[follow:knows]->(some) SET follow.tyre__be_friends='дружат' RETURN follow
+MATCH (temporary:Folk ) WHERE temporary.name = 'Савва' MATCH (name:Folk ) WHERE name.name IN ["Рузиля"] AND name.name <> temporary.name MERGE (temporary)-[u:knows]->(name) SET u.tyre__love='любит' RETURN u
+MATCH (me:Folk ) WHERE me.name = 'Савва' MATCH (other:Folk ) WHERE other.name IN ["Иннокентий", "Влас", "Аникита"] AND other.name <> me.name MERGE (me)-[rel:knows]->(other) SET rel.tyre__dislike='не любит' RETURN rel
+MATCH (name:Folk { name: 'Савва' })  MATCH (me:Folk ) WHERE me.name IN ["Иннокентий"] AND me.name <> name.name MERGE (name)-[relation:knows]->(me) SET relation.tyre__feud='враждует с' RETURN relation
+MATCH (me:Folk { name: 'Савва' })  MATCH (other:Folk ) WHERE other.name IN ["Сильвестр (имя)"] AND other.name <> me.name MERGE (me)-[r:knows]->(other) SET r.tyre__loan='должен' RETURN r
+MATCH (c:Folk { name: 'Савва' })  MATCH (d:Folk ) WHERE d.name IN ["Рузиля"] AND d.name <> c.name MERGE (c)-[follow:knows]->(d) SET follow.tyre__help='помогает' RETURN follow
+MATCH (name:Folk ) WHERE name.name = 'Тит' MATCH (me:Folk ) WHERE me.name IN ["Доля", "Данакт", "Рузиля"] AND me.name <> name.name MERGE (name)-[follow:knows]->(me) SET follow.tyre__like='нравится' RETURN follow
+MATCH (e:Folk ) WHERE e.name = 'Тит' MATCH (f:Folk ) WHERE f.name IN ["Доля"] AND f.name <> e.name MERGE (e)-[relationship:knows]->(f) SET relationship.tyre__love='любит' RETURN relationship
+MATCH (a:Folk { name: 'Сильвестр (имя)' })  MATCH (b:Folk ) WHERE b.name IN ["Савва", "Доля", "Иннокентий", "Рузиля"] AND b.name <> a.name MERGE (a)-[k:knows]->(b) SET k.tyre__like='нравится' RETURN k
+MATCH (other:Folk ) WHERE other.name = 'Сильвестр (имя)' MATCH (person:Folk ) WHERE person.name IN ["Савва", "Иннокентий"] AND person.name <> other.name MERGE (other)-[follow:knows]->(person) SET follow.tyre__be_friends='дружат' RETURN follow
+MATCH (name:Folk { name: 'Сильвестр (имя)' })  MATCH (me:Folk ) WHERE me.name IN ["Рузиля"] AND me.name <> name.name MERGE (name)-[u:knows]->(me) SET u.tyre__love='любит' RETURN u
+MATCH (human:Folk { name: 'Сильвестр (имя)' })  MATCH (man:Folk ) WHERE man.name IN ["Иннокентий", "Влас", "Аникита"] AND man.name <> human.name MERGE (human)-[relationship:knows]->(man) SET relationship.tyre__dislike='не любит' RETURN relationship
+MATCH (f:Folk { name: 'Сильвестр (имя)' })  MATCH (temp:Folk ) WHERE temp.name IN ["Аникита"] AND temp.name <> f.name MERGE (f)-[super:knows]->(temp) SET super.tyre__feud='враждует с' RETURN super
+MATCH (a:Folk { name: 'Сильвестр (имя)' })  MATCH (b:Folk ) WHERE b.name IN ["Рузиля"] AND b.name <> a.name MERGE (a)-[k:knows]->(b) SET k.tyre__help='помогает' RETURN k
+MATCH (me:Folk ) WHERE me.name = 'Доля' MATCH (other:Folk ) WHERE other.name IN ["Поликарп (имя)", "Савва", "Тит", "Сильвестр (имя)", "Данакт", "Иннокентий", "Рузиля", "Влас", "Тихон", "Аникита", "Аристарх"] AND other.name <> me.name MERGE (me)-[super:knows]->(other) SET super.tyre__like='нравится' RETURN super
+MATCH (temporary:Folk ) WHERE temporary.name = 'Доля' MATCH (name:Folk ) WHERE name.name IN ["Иннокентий"] AND name.name <> temporary.name MERGE (temporary)-[to:knows]->(name) SET to.tyre__love='любит' RETURN to
+MATCH (temp:Folk { name: 'Данакт' })  MATCH (temporary:Folk ) WHERE temporary.name IN ["Доля", "Рузиля", "Влас", "Тихон"] AND temporary.name <> temp.name MERGE (temp)-[r:knows]->(temporary) SET r.tyre__like='нравится' RETURN r
+MATCH (c:Folk { name: 'Данакт' })  MATCH (d:Folk ) WHERE d.name IN ["Тихон"] AND d.name <> c.name MERGE (c)-[relation:knows]->(d) SET relation.tyre__be_friends='дружат' RETURN relation
+MATCH (man:Folk { name: 'Данакт' })  MATCH (some:Folk ) WHERE some.name IN ["Тихон"] AND some.name <> man.name MERGE (man)-[to:knows]->(some) SET to.tyre__loan='должен' RETURN to
+MATCH (b:Folk { name: 'Данакт' })  MATCH (c:Folk ) WHERE c.name IN ["Тихон"] AND c.name <> b.name MERGE (b)-[k:knows]->(c) SET k.tyre__criminal='угрожает' RETURN k
+MATCH (b:Folk { name: 'Иннокентий' })  MATCH (c:Folk ) WHERE c.name IN ["Сильвестр (имя)", "Доля"] AND c.name <> b.name MERGE (b)-[follow:knows]->(c) SET follow.tyre__like='нравится' RETURN follow
+MATCH (b:Folk { name: 'Иннокентий' })  MATCH (c:Folk ) WHERE c.name IN ["Сильвестр (имя)"] AND c.name <> b.name MERGE (b)-[to:knows]->(c) SET to.tyre__be_friends='дружат' RETURN to
+MATCH (f:Folk { name: 'Иннокентий' })  MATCH (temp:Folk ) WHERE temp.name IN ["Доля"] AND temp.name <> f.name MERGE (f)-[k:knows]->(temp) SET k.tyre__love='любит' RETURN k
+MATCH (f:Folk ) WHERE f.name = 'Рузиля' MATCH (temp:Folk ) WHERE temp.name IN ["Иннокентий", "Влас", "Аникита"] AND temp.name <> f.name MERGE (f)-[r:knows]->(temp) SET r.tyre__like='нравится' RETURN r
+MATCH (other:Folk ) WHERE other.name = 'Рузиля' MATCH (person:Folk ) WHERE person.name IN ["Иннокентий"] AND person.name <> other.name MERGE (other)-[u:knows]->(person) SET u.tyre__love='любит' RETURN u
+MATCH (other:Folk { name: 'Рузиля' })  MATCH (person:Folk ) WHERE person.name IN ["Доля"] AND person.name <> other.name MERGE (other)-[super:knows]->(person) SET super.tyre__hate='ненавидит' RETURN super
+MATCH (temporary:Folk ) WHERE temporary.name = 'Влас' MATCH (name:Folk ) WHERE name.name IN ["Доля", "Аристарх"] AND name.name <> temporary.name MERGE (temporary)-[u:knows]->(name) SET u.tyre__like='нравится' RETURN u
+MATCH (name:Folk { name: 'Влас' })  MATCH (me:Folk ) WHERE me.name IN ["Доля"] AND me.name <> name.name MERGE (name)-[u:knows]->(me) SET u.tyre__love='любит' RETURN u
+MATCH (b:Folk { name: 'Влас' })  MATCH (c:Folk ) WHERE c.name IN ["Аристарх"] AND c.name <> b.name MERGE (b)-[relation:knows]->(c) SET relation.tyre__loan='должен' RETURN relation
+MATCH (some:Folk { name: 'Влас' })  MATCH (a:Folk ) WHERE a.name IN ["Аристарх"] AND a.name <> some.name MERGE (some)-[super:knows]->(a) SET super.tyre__help='помогает' RETURN super
+MATCH (me:Folk ) WHERE me.name = 'Тихон' MATCH (other:Folk ) WHERE other.name IN ["Доля", "Данакт", "Рузиля"] AND other.name <> me.name MERGE (me)-[rel:knows]->(other) SET rel.tyre__like='нравится' RETURN rel
+MATCH (a:Folk { name: 'Тихон' })  MATCH (b:Folk ) WHERE b.name IN ["Данакт"] AND b.name <> a.name MERGE (a)-[rel:knows]->(b) SET rel.tyre__be_friends='дружат' RETURN rel
+MATCH (name:Folk { name: 'Тихон' })  MATCH (me:Folk ) WHERE me.name IN ["Доля"] AND me.name <> name.name MERGE (name)-[rel:knows]->(me) SET rel.tyre__love='любит' RETURN rel
+MATCH (temp:Folk ) WHERE temp.name = 'Аникита' MATCH (temporary:Folk ) WHERE temporary.name IN ["Тит", "Доля"] AND temporary.name <> temp.name MERGE (temp)-[super:knows]->(temporary) SET super.tyre__like='нравится' RETURN super
+MATCH (f:Folk ) WHERE f.name = 'Аникита' MATCH (temp:Folk ) WHERE temp.name IN ["Доля"] AND temp.name <> f.name MERGE (f)-[r:knows]->(temp) SET r.tyre__love='любит' RETURN r
+MATCH (name:Folk { name: 'Аристарх' })  MATCH (me:Folk ) WHERE me.name IN ["Доля", "Иннокентий", "Рузиля"] AND me.name <> name.name MERGE (name)-[u:knows]->(me) SET u.tyre__like='нравится' RETURN u
