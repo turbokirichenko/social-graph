@@ -31,10 +31,10 @@ const matchForNode = (type, temp, obj, whr) =>
  * @param {*} whr2 
  * @returns 
  */
-const matchForRelation = (rel, node1, node2, whr1, whr2) => 
+const matchForRelation = (rel, node1, node2, whr1, whr2, relObj = '') => 
     match(node1.type, node1.temp, node1.obj, whr1) +
     match(node2.type, node2.temp, node2.obj, whr2) +
-    matchPath('', rel.temp, rel.name, { temp: node1.temp }, { temp: node2.temp }, '') +
+    matchPath('', rel.temp, `${rel.name}${relObj && ' '+relObj}`, { temp: node1.temp }, { temp: node2.temp }, '') +
     returnResult([`count(${rel.temp})`]);
 
 /**

@@ -1,6 +1,8 @@
 var neo4jconnection = require('./utils/neo4j');
 var { createNode, setTheyKnowMe, setRelationTypeByCondition, matchForRelation, matchForRelationX2, matchForNode } = require('./domain');
 var graph = require('./utils/json-parse')();
+console.log('[INFO]: loaded graph');
+console.log(graph);
 var fs = require('fs');
 
 const { driver, session } = neo4jconnection();
@@ -33,13 +35,16 @@ const local = {
     "criminal": "угрожает"
 }
 
-async function attempts(tx, nums = 8) {
+async function attempts(tx, nums = 8, with_relation_types = false) {
     const localHistory = [];
-    for (const attempt in Array(nums).fill(1)) {
+    const rndNum = rnd(nums - Math.floor(nums/2)) + Math.floor(nums/2);
+    for (let count = 0; count < rndNum; ++count) {
         try {
+            const local_key = Object.keys(local)[rnd(Object.keys(local).length)];
             const relation = {
                 temp: variant.relationTemp[rnd(variant.relationTemp.length)],
                 name: variant.relationName,
+                type: local_key
             }
             const node = {
                 temp: variant.temp[rnd(variant.temp.length)],
@@ -55,12 +60,12 @@ async function attempts(tx, nums = 8) {
                 .filter(() => Boolean(rnd(2)))
                 .map(node => node.name);
             const where = Boolean(rnd(2)) ? '' : `${node.temp}.name IN ['${someNames.join("', '")}']`;
+            const relationObj = with_relation_types ? ` { tyre_${relation.type}: '${local[relation.type]}' }` : '';
             const usableCommands = [
-                matchForRelation(relation, node, node2, '', where),
+                matchForRelation(relation, node, node2, '', where, relationObj),
                 matchForRelationX2('path', relation, node, node2, ''),
                 matchForNode(node.type, node.temp, node.obj, where),
             ]
-            if(!rnd(nums)%4) break;
             const num = rnd(usableCommands.length);
             const command = usableCommands[num];
             const result = await tx.run(command);
@@ -79,6 +84,7 @@ async function main() {
         console.log('[INFO]: begin transaction');
         const localHistory = [];
         // create
+        localHistory.push('// создаем группу людей');
         for (const node of graph.nodes) {
             try {
                 const obj = `{name: "${node.name}", city: "${node.region}"}`;
@@ -92,9 +98,8 @@ async function main() {
                 throw err;
             }
         }
-        console.log('[INFO]: created nodes');
-        localHistory.push(...(await attempts(tx, 2)));
-        console.log('[INFO]: checked');
+        console.log('[INFO]: creating nodes ...');
+        localHistory.push("// создаем связь 'знает'");
         // create relations
         for (const node of graph.nodes) {
             try {
@@ -115,12 +120,15 @@ async function main() {
                 throw err;
             }
         }
-        console.log('[INFO]: merge relation between nodes');
-        console.log('[INFO]: set types of relations');
+        console.log('[INFO]: checking result ... ');
+        localHistory.push("// проверка команд");
+        localHistory.push(...(await attempts(tx, 10)));
+        console.log('[INFO]: checked');
         // create types
         let count = 0;
         for (const relation of graph.knows) {
             for (const key of Object.keys(relation)) {
+                localHistory.push( `// задаем тип связи - '${local[key]}' для: '${graph.nodes[count].name}'`);
                 const withObj = Boolean(Math.floor(Math.random() + 0.5)%2);
                 const rs = {
                     temp: variant.relationTemp[rnd(variant.relationTemp.length)],
@@ -149,18 +157,21 @@ async function main() {
                 const command = setRelationTypeByCondition(rs, node1, node2, whr1, whr2, subject);
                 const result = await tx.run(command);
                 localHistory.push(command);
-                localHistory.push(...(await attempts(tx, 2)));
             }
             count++;
         }
-        console.log('[INFO]: finish determinated types of relations ...');
-        console.log('[INFO]: commit transaction ...');
+        console.log('[INFO]: finish determinated types of relations');
+        console.log('[INFO]: checking result ...')
+        localHistory.push("// проверка команд");
+        localHistory.push(...(await attempts(tx, 10, true)));
+        console.log('[INFO]: checked');
+        console.log('[INFO]: commiting transaction ...');
         return localHistory;
     })
     console.log('[INFO]: history is ready ...');
     driver.close().then(() => console.log('[INFO]: connection is closed'));
-    console.log('[INFO]: writing history to file "./example.history.txt" ...')
-    fs.writeFileSync(process.cwd()+'/example.history.txt', history.join('\n'));
+    console.log('[INFO]: writing history to file "./neo4j.cql" ...')
+    fs.writeFileSync(process.cwd()+'/neo4j.cql', history.join('\n'));
 }
 
 main();
