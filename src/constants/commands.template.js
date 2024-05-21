@@ -52,7 +52,7 @@ const setSubject = (variable, type, subject, prefix = '') =>
 
 // commands
 const remove = (type, variable, object) => `MATCH ${node(type, variable, object)} ${deleteResult([variable])} `;
-const create = (type, variable, object) => `CREATE ${node(type, variable, object)} `;
+const create = (type, variable, object) => `CREATE ${node(type, variable, object)}`;
 const match = (type, variable, object, whr = '') => `MATCH ${node(type, variable, object)} ${where(whr)} `;
 const matchRelation = (rel, relName, whr = '') => `MATCH ${relation(rel, relName)} ${where(whr)} `;
 const matchPath = (path, rel = '', relName = '', node1 = {}, node2 = {}, whr = '') => `MATCH ${path && path+'='}${relation(relName, rel, node1, node2)} ${where(whr)}`;

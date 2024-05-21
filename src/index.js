@@ -2,7 +2,6 @@ var neo4jconnection = require('./utils/neo4j');
 var { createNode, setTheyKnowMe, setRelationTypeByCondition, matchForRelation, matchForRelationX2, matchForNode } = require('./domain');
 var graph = require('./utils/json-parse')();
 console.log('[INFO]: loaded graph');
-console.log(graph);
 var fs = require('fs');
 
 const { driver, session } = neo4jconnection();
@@ -11,13 +10,13 @@ const rnd = (len) => Math.floor(Math.random()*len);
 const toLowerCase = (str) => str.toLowerCase();
 const toUpperCase = (str) => str.toUpperCase();
 
-const typeNames = ['People', 'Human', 'Person'];
-const relationNames = ['KNOWN', 'KNOWS', 'knew', 'KNEW', 'familiar']
+const typeNames = ['people', 'human', 'person'];
+const relationNames = ['knows', 'communicating']
 const toSomeCase = Boolean(rnd(2)) ? toLowerCase : toUpperCase;
 
 const variant = {
     type: toSomeCase(typeNames[rnd(typeNames.length)]),
-    temp: ['a', 'b', 'c', 'd', 'e', 'f', 'x', 'temp', 'temporary', 'me', 'other', 'person', 'human', 'man', 'some'],
+    temp: ['a', 'b', 'c', 'd', 'e', 'f', 'x', 'temp', 'temporary', 'me', 'other', 'person', 'human', 'one', 'some'],
     relationName: toSomeCase(relationNames[rnd(relationNames.length)]),
     relationTemp: ['r', 'k', 'u', 'rel', 'relation', 'relationship', 'follow', 'to'],
     pathTemp: ['path', 'p', 'trek'],
@@ -113,7 +112,6 @@ async function main() {
                 const command = setTheyKnowMe(variant.type, a, '', `${a}.name = '${node.name}'`, b, '', `${b}.name <> ${a}.name`, r, rn);
                 const result = await tx.run(command);
                 localHistory.push(command);
-                localHistory.push(...(await attempts(tx, 2)));
             } catch (err) {
                 console.error('[ERROR]: Not executed command!!! [part 2]', err)
                 console.log('[INFO]: rollback transaction');
@@ -125,40 +123,53 @@ async function main() {
         localHistory.push(...(await attempts(tx, 10)));
         console.log('[INFO]: checked');
         // create types
-        let count = 0;
-        for (const relation of graph.knows) {
-            for (const key of Object.keys(relation)) {
-                localHistory.push( `// задаем тип связи - '${local[key]}' для: '${graph.nodes[count].name}'`);
-                const withObj = Boolean(Math.floor(Math.random() + 0.5)%2);
+        // let count = 0;
+        for (const relationType of Object.keys(local)) {
+            let localSubject = local[relationType];
+            let count = 0;
+            localHistory.push(`// задаем тип связи - '${localSubject}'`);
+            for (const relation of graph.knows) {
+                // continue, if relation type is empty
+                if (!(relationType in relation) || !relation[relationType]) {
+                    count++;
+                    continue;
+                }
+                // relation
                 const rs = {
                     temp: variant.relationTemp[rnd(variant.relationTemp.length)],
                     name: variant.relationName,
-                    type: key
+                    type: relationType
                 }
+                // node1
                 const tempRnd = rnd(variant.temp.length);
                 const node1Name = graph.nodes[count].name;
+                const withObj = Boolean(Math.floor(Math.random() + 0.5)%2);
                 const node1 = {
                     temp: variant.temp[tempRnd],
                     type: variant.type,
                     obj: withObj ? `{ name: '${node1Name}' }` : '',
                 };
+                // node2
                 const node2 = {
                     temp: variant.temp[(tempRnd+1)%variant.temp.length],
                     type: variant.type,
                     obj: '',
                 }
-                const otherNames = relation[key].map((link) => {
+                // other name
+                const otherNames = relation[relationType].map((link) => {
                     const index= link - 1;
                     return graph.nodes[index].name;
                 });
+                // set where
                 const whr1 = withObj ? '' : `${node1.temp}.name = '${node1Name}'`;
                 const whr2 = `${node2.temp}.name IN ["${otherNames.join('", "')}"] AND ${node2.temp}.name <> ${node1.temp}.name`;
-                const subject = local[key];
+                const subject = localSubject;
+                // create command
                 const command = setRelationTypeByCondition(rs, node1, node2, whr1, whr2, subject);
                 const result = await tx.run(command);
                 localHistory.push(command);
+                count++;
             }
-            count++;
         }
         console.log('[INFO]: finish determinated types of relations');
         console.log('[INFO]: checking result ...')

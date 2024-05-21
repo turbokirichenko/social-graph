@@ -8,7 +8,7 @@ var { create, match, mergeRelation, matchRelation, returnResult, setRelationType
  * @returns 
  */
 const createNode = (type, variable, obj) =>
-    create(type, variable, obj)
+    create(type, variable, obj) + ';'
 
 /**
  * 
@@ -20,7 +20,7 @@ const createNode = (type, variable, obj) =>
  */
 const matchForNode = (type, temp, obj, whr) => 
     match(type, temp, obj, whr) + 
-    returnResult([temp])
+    returnResult([temp]) + ';'
 
 /**
  * 
@@ -35,7 +35,7 @@ const matchForRelation = (rel, node1, node2, whr1, whr2, relObj = '') =>
     match(node1.type, node1.temp, node1.obj, whr1) +
     match(node2.type, node2.temp, node2.obj, whr2) +
     matchPath('', rel.temp, `${rel.name}${relObj && ' '+relObj}`, { temp: node1.temp }, { temp: node2.temp }, '') +
-    returnResult([`count(${rel.temp})`]);
+    returnResult([`count(${rel.temp})`]) + ';';
 
 /**
  * 
@@ -44,7 +44,7 @@ const matchForRelation = (rel, node1, node2, whr1, whr2, relObj = '') =>
 const matchForRelationX2 = (path, relation, node, node2, where) =>
     match(node.type, node.temp, node.obj, where) +
     matchPath(path, relation.temp, `${relation.name}*2`, node, node2, where) +
-    returnResult([path]);
+    returnResult([path]) + ';';
 
 
 /**
@@ -64,7 +64,7 @@ const setTheyKnowMe = (type, me, object, whereForMe, other, otherObject, whereFo
     match(type, me, object, whereForMe) +
     match(type, other, otherObject, whereForOther) + 
     mergeRelation(relation, relationName, me, other) +
-    returnResult([`count(${relation})`]);
+    returnResult([`count(${relation})`]) + ';';
 
 /** создает тип для отношения по усовиям
  * 
@@ -81,7 +81,7 @@ const setRelationTypeByCondition = (relation, node1, node2, whereForNode1, where
     match(node2.type, node2.temp, node2.obj, whereForNode2) +
     mergeRelation(relation.temp, relation.name, node1.temp, node2.temp) +
     setRelationType(relation.temp, relation.type, relationSubject) +
-    returnResult([`${relation.temp}`])
+    returnResult([`${relation.temp}`]) + ';';
 
 module.exports = {
     createNode,
