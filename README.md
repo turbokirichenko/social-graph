@@ -23,5 +23,5 @@ cd social-graph
 npm ci
 npm run exec
 
-# your result waiting you from ./eample.history.txt
+# your result waiting you from ./neo4j.cql
 ```
