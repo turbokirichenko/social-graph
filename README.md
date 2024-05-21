@@ -18,10 +18,10 @@
 ### and try it!!!
 
 ```sh
-git clone
+git clone https://github.com/turbokirichenko/social-graph.git
 cd social-graph
 npm ci
-npm run dev
+npm run exec
 
 # your result waiting you from ./eample.history.txt
 ```
