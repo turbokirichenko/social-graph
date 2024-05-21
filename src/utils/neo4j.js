@@ -9,8 +9,6 @@ var neo4j = require('neo4j-driver');
  */
 function bootsrtap() {
     try {
-        console.log(process.env.NEO4J_DRIVER_URL);
-        console.log(process.env.NEO4J_USERNAME);
         const driver = neo4j.driver(
             process.env.NEO4J_DRIVER_URL,
             neo4j.auth.basic(process.env.NEO4J_USERNAME, process.env.NEO4J_PASSWORD)
