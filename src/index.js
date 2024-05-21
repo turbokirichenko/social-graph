@@ -60,7 +60,7 @@ async function attempts(tx, nums = 8) {
                 matchForRelationX2('path', relation, node, node2, ''),
                 matchForNode(node.type, node.temp, node.obj, where),
             ]
-            if(rnd(nums) > Math.ceil(nums*0.8)) break;
+            if(!rnd(nums)%4) break;
             const num = rnd(usableCommands.length);
             const command = usableCommands[num];
             const result = await tx.run(command);
